@@ -1,0 +1,655 @@
+<meta charset="UTF-8">
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="description" content="Современная адаптивная веб-страница с гибкой версткой, мобильным меню и оптимизацией под любые устройства">
+    <title>Адаптив | Современный веб-дизайн</title>
+    <!-- Google Fonts: современный шрифт Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            background-color: #fbfdff;
+            color: #1a2c3e;
+            line-height: 1.5;
+            scroll-behavior: smooth;
+        }
+
+        /* CSS переменные для легкой кастомизации */
+        :root {
+            --primary: #2c5f8a;
+            --primary-dark: #1e3e5c;
+            --accent: #4f9da6;
+            --light-bg: #f4f9fe;
+            --gray-light: #eef2f6;
+            --text-dark: #1e2f3b;
+            --text-muted: #5a6e7c;
+            --shadow-sm: 0 8px 20px rgba(0, 0, 0, 0.03), 0 2px 4px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 12px 28px rgba(0, 0, 0, 0.08);
+            --transition: all 0.25s ease;
+        }
+
+        /* Общие утилиты */
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        section {
+            padding: 80px 0;
+        }
+
+        @media (max-width: 768px) {
+            section {
+                padding: 56px 0;
+            }
+            .container {
+                padding: 0 20px;
+            }
+        }
+
+        /* Типографика */
+        h1, h2, h3 {
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        h1 {
+            font-size: clamp(2.2rem, 6vw, 3.8rem);
+            line-height: 1.2;
+            margin-bottom: 1rem;
+        }
+
+        h2 {
+            font-size: clamp(1.8rem, 5vw, 2.6rem);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            max-width: 680px;
+            margin: 0 auto 3rem auto;
+            font-size: 1.1rem;
+        }
+
+        /* Кнопки */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--primary);
+            color: white;
+            font-weight: 600;
+            padding: 12px 28px;
+            border-radius: 60px;
+            text-decoration: none;
+            transition: var(--transition);
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1.5px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* ========== НАВИГАЦИЯ (адаптивное гамбургер-меню, чисто CSS + JS для закрытия) ========== */
+        /* скрытый чекбокс */
+        #nav-toggle {
+            display: none;
+        }
+
+        /* обертка для верхней панели */
+        .navbar {
+            background: white;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05), 0 1px 4px rgba(0, 0, 0, 0.03);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(0px);
+        }
+
+        .nav-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            padding: 0.9rem 24px;
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-size: 1.7rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        /* гамбургер иконка (показывается только на мобильных) */
+        .hamburger-label {
+            display: none;
+            font-size: 1.9rem;
+            cursor: pointer;
+            user-select: none;
+            color: var(--primary);
+            transition: var(--transition);
+            line-height: 1;
+        }
+
+        /* список навигации */
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+            align-items: center;
+            transition: var(--transition);
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            font-weight: 500;
+            color: var(--text-dark);
+            transition: var(--transition);
+            font-size: 1rem;
+            padding: 0.5rem 0;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            transition: width 0.25s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* ----- Адаптив для мобильных устройств (меню-гамбургер) ----- */
+        @media (max-width: 768px) {
+            .hamburger-label {
+                display: block;
+            }
+
+            .nav-links {
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background: white;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0;
+                max-height: 0;
+                overflow: hidden;
+                opacity: 0;
+                visibility: hidden;
+                transition: max-height 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1), opacity 0.2s ease, visibility 0s linear 0.3s;
+                box-shadow: 0 12px 20px rgba(0, 0, 0, 0.05);
+                border-top: 1px solid var(--gray-light);
+                z-index: 999;
+            }
+
+            .nav-links li {
+                width: 100%;
+                border-bottom: 1px solid #edf2f7;
+            }
+
+            .nav-links a {
+                display: block;
+                padding: 1rem 24px;
+                width: 100%;
+                font-size: 1.1rem;
+            }
+
+            /* открытое состояние по чекбоксу */
+            #nav-toggle:checked ~ .navbar .nav-links {
+                max-height: 380px;
+                opacity: 1;
+                visibility: visible;
+                transition: max-height 0.45s ease, opacity 0.25s ease 0.05s, visibility 0s linear 0s;
+            }
+
+            /* небольшая анимация иконки гамбургера при открытии можно через псевдоэлементы, но оставим стандарт */
+            #nav-toggle:checked ~ .navbar .hamburger-label {
+                color: var(--primary-dark);
+            }
+
+            /* коррекция sticky: меню не перекрывает контент */
+            .navbar {
+                position: relative;
+            }
+        }
+
+        /* на десктопе всегда показываем горизонтальное меню */
+        @media (min-width: 769px) {
+            .nav-links {
+                display: flex !important;
+                max-height: none !important;
+                opacity: 1 !important;
+                visibility: visible !important;
+                position: static;
+                flex-direction: row;
+                background: transparent;
+                box-shadow: none;
+                border: none;
+            }
+            .nav-links li {
+                border: none;
+            }
+        }
+
+        /* Hero секция */
+        .hero {
+            background: linear-gradient(135deg, #f0f7ff 0%, #ffffff 100%);
+            padding: 60px 0 80px 0;
+        }
+
+        .hero-grid {
+            display: flex;
+            align-items: center;
+            gap: 3rem;
+            flex-wrap: wrap;
+        }
+
+        .hero-content {
+            flex: 1;
+            min-width: 280px;
+        }
+
+        .hero-content p {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            margin: 1.5rem 0 2rem;
+            max-width: 540px;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .hero-image {
+            flex: 1;
+            text-align: center;
+        }
+
+        .hero-image img {
+            max-width: 100%;
+            width: 100%;
+            max-width: 420px;
+            border-radius: 32px;
+            box-shadow: var(--shadow-md);
+        }
+
+        @media (max-width: 768px) {
+            .hero-grid {
+                flex-direction: column-reverse;
+                text-align: center;
+            }
+            .hero-content p {
+                margin-left: auto;
+                margin-right: auto;
+            }
+            .hero-actions {
+                justify-content: center;
+            }
+        }
+
+        /* Карточки услуг (grid адаптив) */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 2rem;
+            margin-top: 1rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 28px;
+            padding: 2rem 1.5rem;
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid rgba(0, 0, 0, 0.03);
+            text-align: center;
+        }
+
+        .card:hover {
+            transform: translateY(-6px);
+            box-shadow: var(--shadow-md);
+            border-color: rgba(79, 157, 166, 0.2);
+        }
+
+        .card-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: inline-block;
+        }
+
+        .card p {
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+        }
+
+        /* Блок преимуществ / цитата */
+        .features-showcase {
+            background: var(--light-bg);
+            border-radius: 48px;
+            margin: 20px 0;
+        }
+        .feature-inner {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 3rem;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .feature-text {
+            flex: 1.2;
+        }
+        .feature-text h3 {
+            font-size: 1.8rem;
+        }
+        .feature-list {
+            list-style: none;
+            margin-top: 1.5rem;
+        }
+        .feature-list li {
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 500;
+        }
+        .feature-list li::before {
+            content: "✓";
+            color: var(--accent);
+            font-weight: bold;
+            background: #e0f2f4;
+            width: 28px;
+            height: 28px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 30px;
+        }
+        .feature-img {
+            flex: 0.8;
+            text-align: center;
+        }
+        .feature-img img {
+            max-width: 100%;
+            border-radius: 32px;
+            box-shadow: 0 20px 30px -12px rgba(0,0,0,0.1);
+        }
+        @media (max-width: 768px) {
+            .feature-inner {
+                flex-direction: column;
+            }
+            .features-showcase {
+                padding: 2rem 1.5rem;
+            }
+        }
+
+        /* Футер */
+        footer {
+            background: #111e28;
+            color: #cbdfeb;
+            padding: 48px 0 24px;
+            margin-top: 40px;
+        }
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        .footer-col h4 {
+            color: white;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+        .footer-col p, .footer-col a {
+            color: #b6cfdf;
+            text-decoration: none;
+            line-height: 1.6;
+            transition: 0.2s;
+        }
+        .footer-col a:hover {
+            color: white;
+            text-decoration: underline;
+        }
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid #2a3b46;
+            font-size: 0.85rem;
+            color: #8ea3b0;
+        }
+
+        /* вспомогательные классы */
+        .text-center {
+            text-align: center;
+        }
+        .mt-2 {
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Чекбокс для управления мобильным меню (расположен вне .navbar для корректного CSS-селектора) -->
+<input type="checkbox" id="nav-toggle">
+
+<div class="navbar">
+    <div class="nav-container">
+        <div class="logo">Adaptive<span style="color: var(--accent);">Web</span></div>
+        <label for="nav-toggle" class="hamburger-label" aria-label="Открыть меню">☰</label>
+        <!-- Навигационное меню -->
+        <ul class="nav-links">
+            <li><a href="#">Главная</a></li>
+            <li><a href="#services">Услуги</a></li>
+            <li><a href="#features">О нас</a></li>
+            <li><a href="#contact">Контакты</a></li>
+        </ul>
+    </div>
+</div>
+
+<main>
+    <!-- Герой секция -->
+    <section class="hero">
+        <div class="container hero-grid">
+            <div class="hero-content">
+                <h1>Адаптивный веб <br>для будущего</h1>
+                <p>Сайты, которые идеально выглядят на любом устройстве: от смартфонов до широкоформатных мониторов. Современная верстка, высокая производительность и удобство.</p>
+                <div class="hero-actions">
+                    <a href="#" class="btn">Начать проект</a>
+                    <a href="#services" class="btn btn-outline">Узнать больше</a>
+                </div>
+            </div>
+            <div class="hero-image">
+                <img src="https://placekitten.com/500/450" alt="Адаптивный дизайн пример" loading="lazy">
+            </div>
+        </div>
+    </section>
+
+    <!-- Блок услуг (карточки) -->
+    <section id="services">
+        <div class="container">
+            <h2>Ключевые возможности</h2>
+            <div class="section-subtitle">
+                Полная адаптивность, плавные переходы и внимание к деталям — основа нашей методологии.
+            </div>
+            <div class="cards-grid">
+                <div class="card">
+                    <div class="card-icon">📱</div>
+                    <h3>Mobile First</h3>
+                    <p>Гибкая сетка, медиазапросы и резиновая верстка — ваш сайт безупречен на любом экране.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">⚡</div>
+                    <h3>Высокая скорость</h3>
+                    <p>Оптимизация изображений, легкий CSS и минимальный JS для молниеносной загрузки.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🎨</div>
+                    <h3>Современный дизайн</h3>
+                    <p>Трендовые интерфейсы, плавные анимации, удобные отступы и актуальная типографика.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🛠️</div>
+                    <h3>Кроссбраузерность</h3>
+                    <p>Корректное отображение во всех браузерах: Chrome, Safari, Firefox, Edge.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Блок с преимуществами / адаптивные фишки -->
+    <div class="container features-showcase" id="features">
+        <div class="feature-inner">
+            <div class="feature-text">
+                <h3>Адаптивность без компромиссов</h3>
+                <p>Мы строим отзывчивые интерфейсы, которые сами подстраиваются под устройство пользователя. Гибкие CSS Grid, Flexbox и современные медиавыражения.</p>
+                <ul class="feature-list">
+                    <li>Динамическое изменение сетки от 1 до 4 колонок</li>
+                    <li>Гамбургер-меню с плавной анимацией</li>
+                    <li>Адаптивные шрифты (clamp, относительные единицы)</li>
+                    <li>Retina-ready графика и оптимизированные медиа</li>
+                </ul>
+                <a href="#" class="btn" style="margin-top: 1rem;">Демонстрация</a>
+            </div>
+            <div class="feature-img">
+                <img src="placeholder.picsum.pro" alt="адаптивная верстка на разных устройствах" loading="lazy">
+            </div>
+        </div>
+    </div>
+
+    <!-- Блок про технологии + дополнительный responsive call to action -->
+    <section>
+        <div class="container text-center">
+            <h2>Готовы создать идеальный сайт?</h2>
+            <div class="section-subtitle" style="margin-bottom: 2rem;">
+                Индивидуальный подход, адаптивная вёрстка "под ключ" и поддержка всех современных устройств.
+            </div>
+            <a href="#" class="btn">Связаться с нами →</a>
+        </div>
+    </section>
+</main>
+
+<footer id="contact">
+    <div class="container">
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h4>AdaptiveWeb</h4>
+                <p>Создание сайтов, которые работают везде. Адаптивный дизайн, чистый код и любовь к деталям.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Навигация</h4>
+                <p><a href="#">Главная</a></p>
+                <p><a href="#services">Услуги</a></p>
+                <p><a href="#features">О компании</a></p>
+                <p><a href="#">Блог</a></p>
+            </div>
+            <div class="footer-col">
+                <h4>Контакты</h4>
+                <p>📧 hello@adaptiveweb.ru</p>
+                <p>📞 +7 (495) 123-45-67</p>
+                <p>📍 Москва, ул. Цифровая, 12</p>
+            </div>
+            <div class="footer-col">
+                <h4>Соцсети</h4>
+                <p>Telegram | VK | Dribbble</p>
+                <p style="margin-top: 8px;">© 2025 Все права защищены</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span>✨ Адаптивная веб-страница — безупречное отображение на всех экранах ✨</span>
+        </div>
+    </div>
+</footer>
+
+<!-- Небольшой JS для удобства: закрытие мобильного меню после клика по ссылке и сброс при ресайзе (если окно >768px) -->
+<script>
+    (function() {
+        const navToggle = document.getElementById('nav-toggle');
+        const navLinks = document.querySelectorAll('.nav-links a');
+        const hamburgerLabel = document.querySelector('.hamburger-label');
+
+        // Закрытие меню при клике на любую ссылку в мобильном режиме
+        if (navToggle) {
+            navLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    if (window.innerWidth <= 768 && navToggle.checked) {
+                        navToggle.checked = false;
+                    }
+                });
+            });
+
+            // Дополнительно: если пользователь изменяет размер окна с открытым меню на десктопный режим,
+            // снимаем флаг и возвращаем нормальное состояние (чтобы меню не осталось в "открытом" состоянии при переключении)
+            window.addEventListener('resize', function() {
+                if (window.innerWidth > 768 && navToggle.checked) {
+                    navToggle.checked = false;
+                }
+                // при переходе на мобильный и обратно – поведение корректно за счёт CSS
+            });
+            
+            // Закрытие при клике вне меню? (опционально - для улучшения UX)
+            document.addEventListener('click', function(e) {
+                if (window.innerWidth <= 768 && navToggle.checked) {
+                    const isClickInsideNav = e.target.closest('.nav-links') || e.target.closest('.hamburger-label') || e.target === navToggle;
+                    if (!isClickInsideNav) {
+                        navToggle.checked = false;
+                    }
+                }
+            });
+        }
+    })();
+</script>
+</body>
+</html>
